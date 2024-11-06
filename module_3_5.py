@@ -2,34 +2,27 @@ def calculate_structure_product(data):
     product = 1
     has_numbers = False  # Флаг для отслеживания наличия чисел
 
-    # Проверяем тип данных
     if isinstance(data, dict):
-        # Если это словарь, перебираем ключи и значения
-        for key, value in data.items():
-            result = calculate_structure_product(key)  # Обрабатываем ключи
-            if result == 0:
-                return 0  # Если одно из произведений равно 0
-            product *= result
-            result = calculate_structure_product(value)  # Обрабатываем значения
-            if result == 0:
-                return 0  # Если одно из произведений равно 0
-            product *= result
-            has_numbers = True
-    elif isinstance(data, list) or isinstance(data, tuple):
-        # Если это список или кортеж, перебираем элементы
-        for item in data:
-            result = calculate_structure_product(item)
-            if result == 0:
-                return 0  # Если одно из произведений равно 0
-            product *= result
-            has_numbers = True
-    elif isinstance(data, str):
-        # Если это строка, добавляем её длину
-        product *= len(data)
-        has_numbers = True
-    elif isinstance(data, (int, float)):
-        # Если это число, перемножаем его значение
-        product *= data
+        items = data.items()
+    elif isinstance(data, (list, tuple)):
+        items = data
+    else:
+        items = [data]  # Обрабатываем один элемент, если это не коллекция
+
+    for item in items:
+        if isinstance(item, (dict, list, tuple)):
+            result = calculate_structure_product(item)  # Рекурсивный вызов
+        elif isinstance(item, str):
+            result = len(item)  # Длина строки
+        elif isinstance(item, (int, float)):
+            result = item  # Число
+        else:
+            continue  # Игнорируем неподдерживаемые типы
+
+        if result == 0:
+            return 0  # Если одно из произведений равно 0
+
+        product *= result
         has_numbers = True
 
     return product if has_numbers else 0  # Возвращаем 0, если не было чисел
@@ -37,13 +30,10 @@ def calculate_structure_product(data):
 
 def get_multiplied_digits(number):
     str_number = str(number)  # Преобразуем число в строку
-    first = int(str_number[0])  # Берем первую цифру
-
-    # Если длина строки больше 1, продолжаем рекурсию
-    if len(str_number) > 1:
-        return first * get_multiplied_digits(int(str_number[1:]))  # Умножаем первую цифру на результат рекурсии
-    else:
-        return first  # Если осталась одна цифра, просто возвращаем её
+    if len(str_number) == 1:
+        return int(str_number)  # Если осталась одна цифра, просто возвращаем её
+    return int(str_number[0]) * get_multiplied_digits(
+        int(str_number[1:]))  # Умножаем первую цифру на результат рекурсии
 
 
 # Пример использования функции calculate_structure_product
